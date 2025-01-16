@@ -22,7 +22,7 @@ pipeline {
             sh '''
                 echo "Inside Test stage"
                 ls -la
-                test -f index.html
+                test -f build/index.html
                 npm run test
             '''
             }
