@@ -6,12 +6,15 @@ pipeline {
     }
     stages {
         stage('Build') {
+            steps {
+
             sh '''
             echo "Inside Build stage"
             npm --version
             node --version
             ls -la
             '''
+            }
         }
     }
 }
