@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'node:20-alpine'
-            reuseWs()
+            reuseNode true
         }
     }
     stages {
