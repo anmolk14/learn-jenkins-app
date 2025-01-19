@@ -1,14 +1,16 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:20-alpine'
-            reuseNode true
-        }
-    }
+    agent any
+
     stages {
-        /*
 
         stage('Build') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    reuseNode true
+                }
+            }
+
             steps {
             sh '''
                 echo "Inside Build stage"
@@ -19,8 +21,6 @@ pipeline {
             '''
             }
         }
-
-        */
 
         stage('Test') {
             agent {
