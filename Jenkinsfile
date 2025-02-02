@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     stages {
-        /*
         stage('Build') {
             agent {
                 docker {
@@ -18,10 +17,12 @@ pipeline {
                 node --version
                 npm ci
                 npm run build
+                ls -la
             '''
             }
         }
 
+        /*
         stage('Docker') {
             steps {
                 sh 'docker build -t my-playwright .'
@@ -43,8 +44,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                     sh '''
                         aws --version
-                        echo "Hello S3!" > TestHello.txt
-                        aws s3 cp TestHello.txt s3://$AWS_S3_BUCKET/TestHello.txt
+                        aws s3 sync build s3://$AWS_S3_BUCKET
                     '''
                 }
             }
