@@ -2,6 +2,24 @@ pipeline {
     agent any
 
     stages {
+        stage('Deploy to AWS') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    args "--entrypoint=''"
+                    reuseNode true
+                }
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    sh '''
+                        aws --version
+                        aws ecs register-task-definition  --cli-input-json file://aws/task-definition.json
+                    '''
+                }
+            }
+        }
+
         stage('Build') {
             agent {
                 docker {
@@ -29,63 +47,6 @@ pipeline {
             }
         }
         */
-
-        stage('AWS') {
-            agent {
-                docker {
-                    image 'amazon/aws-cli'
-                    args "--entrypoint=''"
-                    reuseNode true
-                }
-            }
-            environment {
-                AWS_S3_BUCKET = 'my-aws-bucket-03022025-002728'
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-                    sh '''
-                        aws --version
-                        aws s3 sync build s3://$AWS_S3_BUCKET
-                    '''
-                }
-            }
-        }
-
-        stage('Test') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    reuseNode true
-                }
-            }
-
-            steps {
-            sh '''
-                echo "Inside Test stage"
-                ls -la
-                test -f build/index.html
-                npm run test
-            '''
-            }
-        }
-
-        stage('E2E') {
-            agent {
-                docker {
-                    image 'my-playwright'
-                    reuseNode true
-                }
-            }
-            
-            steps {
-            sh '''
-                echo "Inside E2E stage"
-                serve -s build &
-                sleep 10
-                npx playwright test --reporter=html
-            '''
-            }
-        }
     }
 
     post {
