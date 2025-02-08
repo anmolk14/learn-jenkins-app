@@ -30,6 +30,13 @@ pipeline {
         }
 
         stage("Build Docker Image") {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    args "-u root --entrypoint=''"
+                    reuseNode true
+                }
+            }
             steps {
                 sh '''
                     docker build -t myjenkinsapp .
